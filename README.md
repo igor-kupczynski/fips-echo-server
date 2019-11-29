@@ -6,9 +6,10 @@ Experiments with FIPS-compliant Golang crypto
 
 We have a simple http(s) echo server. It echos up to 140 characters of whatever you send it to it.
 
-Let's run it:
+Let's run it (press `Ctrl+C` to stop):
 ```sh
-> go run .
+$ make build
+$ ./fips-echo-server
 2019/11/29 19:26:00 Listening on https://localhost:8443 with cert=certs/domain.pem and key=certs/domain.key
 ```
 
@@ -22,14 +23,14 @@ Note that I'm embedding some self-signed certs in the `certs` folder. We need `-
 
 You can also run the tests:
 ```sh
-$ cd echo     
-$ go  test -v
-  === RUN   TestServe
-  === RUN   TestServe/Echo_the_message_back_to_the_client
-  === RUN   TestServe/Limit_to_140_characters
-  --- PASS: TestServe (0.03s)
-      --- PASS: TestServe/Echo_the_message_back_to_the_client (0.02s)
-      --- PASS: TestServe/Limit_to_140_characters (0.02s)
-  PASS
-  ok  	github.com/igor-kupczynski/fips-echo-server/echo	0.134s
+$ make test
+?   	github.com/igor-kupczynski/fips-echo-server	[no test files]
+=== RUN   TestServe
+=== RUN   TestServe/Echo_the_message_back_to_the_client
+=== RUN   TestServe/Limit_to_140_characters
+--- PASS: TestServe (0.04s)
+    --- PASS: TestServe/Echo_the_message_back_to_the_client (0.02s)
+    --- PASS: TestServe/Limit_to_140_characters (0.02s)
+PASS
+ok  	github.com/igor-kupczynski/fips-echo-server/echo	0.222s
 ```

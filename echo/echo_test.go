@@ -40,13 +40,13 @@ func TestServe(t *testing.T) {
 	for _, tt := range tests {
 		port++
 		t.Run(tt.name, func(t *testing.T) {
-			s := Server(port, certFile, keyFile)
+			s := Server(fmt.Sprintf("localhost:%d", port), certFile, keyFile)
 			ready := make(chan struct{})
 			go func(ready <-chan struct{}, in, out string) {
 				<-ready
 
 				client := buildHttpsClient(t, caFile)
-				target := fmt.Sprintf("https://localhost:%d", s.port)
+				target := fmt.Sprintf("https://%s", s.address)
 				resp, err := client.Post(target, "text/plain", strings.NewReader(in))
 				if err != nil {
 					t.Errorf("Can't connect to server = %v", err)

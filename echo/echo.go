@@ -3,7 +3,6 @@ package echo
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"net/http"
 )
@@ -20,10 +19,10 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Server returns a server struct
-func Server(port int, certFile, keyFile string) *server {
+func Server(address, certFile, keyFile string) *server {
 	mux := http.NewServeMux()
 	return &server{
-		port:     port,
+		address:  address,
 		certFile: certFile,
 		keyFile:  keyFile,
 		mux:      mux,
@@ -35,8 +34,8 @@ func Server(port int, certFile, keyFile string) *server {
 
 // server is the echo server internal state
 type server struct {
-	// Port on which the server listens
-	port int
+	// Address on which the server listens
+	address string
 	// Certificate file to use
 	certFile string
 	// Private key to the certificate
@@ -47,17 +46,12 @@ type server struct {
 	srv *http.Server
 }
 
-// address returns address on which the server listens
-func (s *server) address() string {
-	return fmt.Sprintf("localhost:%d", s.port)
-}
-
 // Serve starts the echo server
 func (s *server) Serve(ready chan<- struct{}) error {
 
 	s.mux.HandleFunc("/", echoHandler)
 
-	ln, err := net.Listen("tcp", s.address())
+	ln, err := net.Listen("tcp", s.address)
 	if err != nil {
 		return err
 	}

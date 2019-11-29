@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	port     = flag.Int("port", 8443, "port for the server to listen on")
+	address  = flag.String("address", "localhost:8443", "address for the server to listen on")
 	certFile = flag.String("certFile", "certs/domain.pem", "path to server certificate")
 	keyFile  = flag.String("keyFile", "certs/domain.key", "path to server key")
 )
@@ -15,12 +15,12 @@ var (
 func main() {
 	flag.Parse()
 
-	srv := echo.Server(*port, *certFile, *keyFile)
+	srv := echo.Server(*address, *certFile, *keyFile)
 
 	ready := make(chan struct{})
 	go func(ready <-chan struct{}) {
 		<-ready
-		log.Printf("Listening on https://localhost:%d with cert=%s and key=%s\n", *port, *certFile, *keyFile)
+		log.Printf("Listening on https://%s with cert=%s and key=%s\n", *address, *certFile, *keyFile)
 	}(ready)
 	log.Fatal(srv.Serve(ready))
 }
