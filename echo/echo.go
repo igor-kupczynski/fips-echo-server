@@ -8,20 +8,6 @@ import (
 	"net/http"
 )
 
-func init() {
-	http.HandleFunc("/", echoHandler)
-}
-
-// Config is the echo server configuration
-type Config struct {
-	Port int
-}
-
-// Address returns address on which the server listens
-func (c *Config) Address() string {
-	return fmt.Sprintf(":%d", c.Port)
-}
-
 const echoLimit = 140
 
 func echoHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,20 +19,53 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var srv *http.Server = &http.Server{}
+// Server returns a server struct
+func Server(port int, certFile, keyFile string) *server {
+	mux := http.NewServeMux()
+	return &server{
+		port:     port,
+		certFile: certFile,
+		keyFile:  keyFile,
+		mux:      mux,
+		srv: &http.Server{
+			Handler: mux,
+		},
+	}
+}
+
+// server is the echo server internal state
+type server struct {
+	// Port on which the server listens
+	port int
+	// Certificate file to use
+	certFile string
+	// Private key to the certificate
+	keyFile string
+	// Multiplexer to register the handles on
+	mux *http.ServeMux
+	// http.Server handle
+	srv *http.Server
+}
+
+// address returns address on which the server listens
+func (s *server) address() string {
+	return fmt.Sprintf("localhost:%d", s.port)
+}
 
 // Serve starts the echo server
-func Serve(c Config, ready chan<- struct{}) error {
+func (s *server) Serve(ready chan<- struct{}) error {
 
-	ln, err := net.Listen("tcp", c.Address())
+	s.mux.HandleFunc("/", echoHandler)
+
+	ln, err := net.Listen("tcp", s.address())
 	if err != nil {
 		return err
 	}
 	ready <- struct{}{}
-	return srv.Serve(ln)
+	return s.srv.ServeTLS(ln, s.certFile, s.keyFile)
 }
 
 // Shutdown the running server
-func Shutdown() error {
-	return srv.Shutdown(context.Background())
+func (s *server) Shutdown() error {
+	return s.srv.Shutdown(context.Background())
 }
