@@ -72,3 +72,46 @@ $ make run
 ```
 
 Since golang is multiplatform, docker may seem like an overkill. There are  some advantages, e.g. when it comes to CI pipeline or artifact distribution. The main motivation for the dockerized build & run in the repo is to demonstrate the FIPS compliant go toolchain. It will save us the hassle of setting it latter.
+
+## TLS setup
+
+What are the ciphers we use by default? To test that we'll use the [`testssl.sh`](https://github.com/drwetter/testssl.sh) script.
+```sh
+# not in the project directory
+$ git clone git@github.com:drwetter/testssl.sh.git
+$ cd testssl.sh
+$ ./testssl.sh localhost:8443
+...
+ Testing server preferences
+
+ Has server cipher order?     yes (OK) -- TLS 1.3 and below
+ Negotiated protocol          TLSv1.3
+ Negotiated cipher            TLS_AES_128_GCM_SHA256, 253 bit ECDH (X25519)
+ Cipher order
+    TLSv1:     ECDHE-RSA-AES128-SHA ECDHE-RSA-AES256-SHA AES128-SHA AES256-SHA ECDHE-RSA-DES-CBC3-SHA DES-CBC3-SHA
+    TLSv1.1:   ECDHE-RSA-AES128-SHA ECDHE-RSA-AES256-SHA AES128-SHA AES256-SHA ECDHE-RSA-DES-CBC3-SHA DES-CBC3-SHA
+    TLSv1.2:   ECDHE-RSA-AES128-GCM-SHA256 ECDHE-RSA-AES256-GCM-SHA384 ECDHE-RSA-CHACHA20-POLY1305 ECDHE-RSA-AES128-SHA ECDHE-RSA-AES256-SHA AES128-GCM-SHA256 AES256-GCM-SHA384
+               AES128-SHA AES256-SHA ECDHE-RSA-DES-CBC3-SHA DES-CBC3-SHA
+    TLSv1.3:   TLS_AES_128_GCM_SHA256 TLS_CHACHA20_POLY1305_SHA256 TLS_AES_256_GCM_SHA384
+...
+```
+
+`testssl.sh` presents a long report, but for us the important part is given above. By default go 1.13 support TLSv1.0--TLSv1.3. Let's be more strict here and select only the [protocols and ciphers recommended by Mozilla for a _modern_ configuration](https://wiki.mozilla.org/Security/Server_Side_TLS).
+
+_You can also add the args to `CMD` in `Dockerfile`_.
+
+```sh
+$ ./fips-echo-server -tlsVersion TLSv1.3 -tlsCiphers TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:ECDHE-RSA-AES128-GCM-SHA256
+```
+
+This results is:
+```sh
+...
+ Testing server preferences
+
+ Has server cipher order?     yes (TLS 1.3 only)
+ Negotiated protocol          TLSv1.3
+ Negotiated cipher            TLS_AES_128_GCM_SHA256, 253 bit ECDH (X25519)
+ Cipher order
+    TLSv1.3:   TLS_AES_128_GCM_SHA256 TLS_CHACHA20_POLY1305_SHA256 TLS_AES_256_GCM_SHA384
+```

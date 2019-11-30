@@ -3,6 +3,7 @@ package echo
 
 import (
 	"context"
+	"crypto/tls"
 	"net"
 	"net/http"
 )
@@ -19,15 +20,26 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Server returns a server struct
-func Server(address, certFile, keyFile string) *server {
+func Server(address, certFile, keyFile string, tlsVersion *uint16, ciphers []uint16) *server {
 	mux := http.NewServeMux()
+
+	tlsConfig := &tls.Config{
+		CipherSuites:             ciphers,
+		PreferServerCipherSuites: true,
+	}
+
+	if tlsVersion != nil {
+		tlsConfig.MinVersion = *tlsVersion
+	}
+
 	return &server{
 		address:  address,
 		certFile: certFile,
 		keyFile:  keyFile,
 		mux:      mux,
 		srv: &http.Server{
-			Handler: mux,
+			Handler:   mux,
+			TLSConfig: tlsConfig,
 		},
 	}
 }

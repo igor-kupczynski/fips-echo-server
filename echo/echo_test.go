@@ -40,7 +40,7 @@ func TestServe(t *testing.T) {
 	for _, tt := range tests {
 		port++
 		t.Run(tt.name, func(t *testing.T) {
-			s := Server(fmt.Sprintf("localhost:%d", port), certFile, keyFile)
+			s := Server(fmt.Sprintf("localhost:%d", port), certFile, keyFile, nil, nil)
 			ready := make(chan struct{})
 			go func(ready <-chan struct{}, in, out string) {
 				<-ready
