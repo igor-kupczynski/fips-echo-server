@@ -75,6 +75,8 @@ Since golang is multiplatform, docker may seem like an overkill. There are  some
 
 ## TLS setup
 
+Suggested reading from Cloudflare on the subject — [_So you want to expose Go on the Internet_](https://blog.cloudflare.com/exposing-go-on-the-internet/).
+
 What are the ciphers we use by default? To test that we'll use the [`testssl.sh`](https://github.com/drwetter/testssl.sh) script.
 ```sh
 # not in the project directory
