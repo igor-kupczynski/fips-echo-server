@@ -39,7 +39,9 @@ ok  	github.com/igor-kupczynski/fips-echo-server/echo	0.222s
 
 ## Dockerized version
 
-To abstract away the go toolchain you may have installed locally we also provide a [Dockerfile](./Dockerfile). It starts with `golang`, which is the _official_ go toolchain image. The it adds the project folder to `/app` in the container and compiles it into a binary. Finally, it exposes the `:8443` port and sets the produced binary as the default startup command for the container.
+To build/run independently of a local go toolchain we provide a [Dockerfile](./Dockerfile).
+
+It is based on `golang`, which is the _official_ go toolchain image. The it adds the project folder to `/app` in the container and compiles it into a binary. Finally, it exposes the `:8443` port and sets the produced binary as the default startup command for the container.
 
 We have a [`Makefile`](./Makefile) to save us some typing. Check it out for the exact commands.
 
@@ -71,7 +73,7 @@ $ make run
 2019/11/29 23:40:46 Listening on https://0.0.0.0:8443 with cert=certs/domain.pem and key=certs/domain.key
 ```
 
-Since golang is multiplatform, docker may seem like an overkill. There are  some advantages, e.g. when it comes to CI pipeline or artifact distribution. The main motivation for the dockerized build & run in the repo is to demonstrate the FIPS compliant go toolchain. It will save us the hassle of setting it latter.
+The main motivation for the dockerized build & run in the repo is to demonstrate the FIPS compliant go toolchain. It will save us the hassle of setting it latter.
 
 ## TLS setup
 
@@ -117,3 +119,7 @@ This results is:
  Cipher order
     TLSv1.3:   TLS_AES_128_GCM_SHA256 TLS_CHACHA20_POLY1305_SHA256 TLS_AES_256_GCM_SHA384
 ```
+
+## FIPS compliant version
+
+Please check the [`boringcrypto` branch](tree/boringcrypto) branch for details. Compare it with the current one to find the changes needed to support a FIPS mode in our app.
