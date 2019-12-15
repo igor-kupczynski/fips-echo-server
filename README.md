@@ -2,6 +2,8 @@
 
 Experiments with FIPS-compliant Golang crypto
 
+This repo has a companion blog post, check <https://kupczynski.info/2019/12/15/fips-golang.html>.
+
  ## Http echo server
 
 We have a simple http(s) echo server. It echos up to 140 characters of whatever you send it to it.
