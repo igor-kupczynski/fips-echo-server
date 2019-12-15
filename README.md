@@ -122,4 +122,4 @@ This results is:
 
 ## FIPS compliant version
 
-Please check the [`boringcrypto` branch](tree/boringcrypto) branch for details. Compare it with the current one to find the changes needed to support a FIPS mode in our app.
+Please check the [`boringcrypto` branch](https://github.com/igor-kupczynski/fips-echo-server/compare/master...boringcrypto) branch for details. Compare it with the current one to find the changes needed to support a FIPS mode in our app.
