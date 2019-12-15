@@ -181,6 +181,56 @@ TLSv1.3 (no server order, thus listed by strength)
 
 ## FIPS compliant version
 
-Please check the
-[`boringcrypto-1.18` branch](https://github.com/igor-kupczynski/fips-echo-server/compare/main-1.18...boringcrypto-1.18)
-branch for details. Compare it with the current one to find the changes needed to support a FIPS mode in our app.
+The boringssl based toolchain is basically a drop in replacement. All we need to do is:
+
+```diff
+--- a/Dockerfile	(revision 3209b023ad9173f1deebcc5ff91b4c315510299e)
++++ b/Dockerfile	(date 1664401645292)
+@@ -1,15 +1,16 @@
+-FROM golang:1.18.6
++FROM us-docker.pkg.dev/google.com/api-project-999119582588/go-boringcrypto/golang:1.18.6b7
+```
+
+There are some other changes in the branch, to add new option `-fipsMode`, which resets the ciphersuite to a FIPS
+compliant one. You may want to do something else, like still allow user configured ciphers as long as they are a subset
+of FIPS compliant ones, etc. But these changes are UX improvements when running in FIPS mode. No "core" app changes
+required.
+
+testssl reports this:
+```
+...
+ Testing server's cipher preferences 
+
+Hexcode  Cipher Suite Name (OpenSSL)       KeyExch.   Encryption  Bits     Cipher Suite Name (IANA/RFC)
+-----------------------------------------------------------------------------------------------------------------------------
+SSLv2
+ - 
+SSLv3
+ - 
+TLSv1
+ - 
+TLSv1.1
+ - 
+TLSv1.2 (server order)
+ xc02f   ECDHE-RSA-AES128-GCM-SHA256       ECDH 521   AESGCM      128      TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256              
+ xc030   ECDHE-RSA-AES256-GCM-SHA384       ECDH 521   AESGCM      256      TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384              
+ x9c     AES128-GCM-SHA256                 RSA        AESGCM      128      TLS_RSA_WITH_AES_128_GCM_SHA256                    
+ x9d     AES256-GCM-SHA384                 RSA        AESGCM      256      TLS_RSA_WITH_AES_256_GCM_SHA384                    
+TLSv1.3 (no server order, thus listed by strength)
+ x1302   TLS_AES_256_GCM_SHA384            ECDH 253   AESGCM      256      TLS_AES_256_GCM_SHA384                             
+ x1303   TLS_CHACHA20_POLY1305_SHA256      ECDH 253   ChaCha20    256      TLS_CHACHA20_POLY1305_SHA256                       
+ x1301   TLS_AES_128_GCM_SHA256            ECDH 253   AESGCM      128      TLS_AES_128_GCM_SHA256                             
+
+ Has server cipher order?     yes (OK) -- only for < TLS 1.3
+ Negotiated protocol          TLSv1.3
+ Negotiated cipher            TLS_AES_128_GCM_SHA256, 253 bit ECDH (X25519)
+
+...
+```
+
+### Performance implication
+
+See [golang/go#21525](https://github.com/golang/go/issues/21525). Calling boringcrypto via cgo adds about 200ns per
+call. Note that the results are from 2017 and cgo performance might have improved since then. Depending on you usecase
+this maybe acceptable, or even come unnoticed. Do performance test your app. Of course, if you need it to be
+FIPS compliant you have to accept the hit. 

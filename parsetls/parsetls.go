@@ -67,3 +67,10 @@ func CipherSuites(input string) ([]uint16, error) {
 	}
 	return cipers, nil
 }
+
+// FIPSTLSVersion specifies a FIPS compliant minimum TLS version
+const FIPSTLSVersion = "TLSv1.2"
+
+// FIPSCiphers specify a list of FIPS compliant ciphers
+// The list is taken from https://github.com/golang/go/blob/dev.boringcrypto.go1.13/src/crypto/tls/boring.go#L54
+const FIPSCiphers = "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-GCM-SHA384"

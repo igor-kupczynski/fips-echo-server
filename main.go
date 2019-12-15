@@ -8,11 +8,34 @@ import (
 )
 
 var (
-	address    = flag.String("address", "localhost:8443", "address for the server to listen on")
-	certFile   = flag.String("certFile", "certs/domain.pem", "path to server certificate")
-	keyFile    = flag.String("keyFile", "certs/domain.key", "path to server key")
-	tlsVersion = flag.String("tlsVersion", "", "min TLS version, e.g. TLSv1.3")
-	tlsCiphers = flag.String("tlsCiphers", "", "ciphersuites to use in mozilla string format, e.g. TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:ECDHE-RSA-AES128-GCM-SHA256")
+	address = flag.String(
+		"address",
+		"localhost:8443",
+		"address for the server to listen on",
+	)
+	certFile = flag.String(
+		"certFile",
+		"certs/domain.pem",
+		"path to server certificate",
+	)
+	keyFile = flag.String(
+		"keyFile", "certs/domain.key",
+		"path to server key",
+	)
+	tlsVersion = flag.String(
+		"tlsVersion", "TLSv1.2",
+		"min TLS version, e.g. TLSv1.3",
+	)
+	tlsCiphers = flag.String(
+		"tlsCiphers",
+		"",
+		"ciphersuites to use in mozilla string format, e.g. TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:ECDHE-RSA-AES128-GCM-SHA256",
+	)
+	fipsMode = flag.String(
+		"fipsMode",
+		"false",
+		"If true it overrides the min TLS version and ciphersuites with FIPS compliant set",
+	)
 )
 
 func main() {
@@ -34,6 +57,14 @@ func main() {
 }
 
 func parseTlsConfig() (version *uint16, ciphers []uint16, err error) {
+	if *fipsMode == "true" {
+		fipsVersion := parsetls.FIPSTLSVersion
+		tlsVersion = &fipsVersion
+		fipsCiphers := parsetls.FIPSCiphers
+		tlsCiphers = &fipsCiphers
+		log.Printf("Switch TLS settings to FIPS compliant: %s %s\n", fipsVersion, fipsCiphers)
+	}
+
 	if *tlsVersion != "" {
 		v, err := parsetls.Version(*tlsVersion)
 		if err != nil {

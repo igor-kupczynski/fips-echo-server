@@ -31,6 +31,22 @@ func TestCipherSuites(t *testing.T) {
 			},
 			false,
 		},
+		// FIPS compliant list is taken from https://github.com/golang/go/blob/dev.boringcrypto.go1.13/src/crypto/tls/boring.go#L54
+		{
+			"FIPS compliant ciphers",
+			"ECDHE-RSA-AES128-GCM-SHA256" + ":" + "ECDHE-RSA-AES256-GCM-SHA384" + ":" +
+				"ECDHE-ECDSA-AES128-GCM-SHA256" + ":" + "ECDHE-ECDSA-AES256-GCM-SHA384" + ":" +
+				"AES128-GCM-SHA256" + ":" + "AES256-GCM-SHA384",
+			[]uint16{
+				tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+				tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
+				tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+			},
+			false,
+		},
 		{
 			"Invalid",
 			"ECDHE-ECDSA-AES128-GCM-SHA256:foobar",
