@@ -1,4 +1,4 @@
-// parsetls contains utils for parsing the TLS settings.
+// Package parsetls contains utils for parsing the TLS settings.
 //
 // We need this because golang stdlib contains only numeric constants for the
 // ciphers and the protocols.

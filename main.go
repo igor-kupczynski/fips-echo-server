@@ -23,7 +23,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	srv := echo.Server(*address, *certFile, *keyFile, parsedTlsVersion, parsedCiphers)
+	srv := echo.NewServer(*address, *certFile, *keyFile, parsedTlsVersion, parsedCiphers)
 
 	ready := make(chan struct{})
 	go func(ready <-chan struct{}) {

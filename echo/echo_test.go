@@ -40,7 +40,7 @@ func TestServe(t *testing.T) {
 	for _, tt := range tests {
 		port++
 		t.Run(tt.name, func(t *testing.T) {
-			s := Server(fmt.Sprintf("localhost:%d", port), certFile, keyFile, nil, nil)
+			s := NewServer(fmt.Sprintf("localhost:%d", port), certFile, keyFile, nil, nil)
 			ready := make(chan struct{})
 			go func(ready <-chan struct{}, in, out string) {
 				<-ready
@@ -84,7 +84,6 @@ func buildHttpsClient(t *testing.T, caFile string) *http.Client {
 	tlsConfig := &tls.Config{
 		RootCAs: caCertPool,
 	}
-	tlsConfig.BuildNameToCertificate()
 	transport := &http.Transport{TLSClientConfig: tlsConfig}
 	return &http.Client{Transport: transport}
 }

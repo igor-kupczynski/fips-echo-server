@@ -1,5 +1,5 @@
 # Start with an official image
-FROM golang:1.13.4
+FROM golang:1.18.6
 
 # Bundle the project source in the container
 RUN mkdir -p /app

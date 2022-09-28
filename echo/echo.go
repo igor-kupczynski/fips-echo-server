@@ -1,4 +1,4 @@
-// echo contains an echo server implementation
+// Package echo contains an echo server implementation
 package echo
 
 import (
@@ -19,20 +19,19 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Server returns a server struct
-func Server(address, certFile, keyFile string, tlsVersion *uint16, ciphers []uint16) *server {
+// NewServer returns a Server struct
+func NewServer(address, certFile, keyFile string, tlsVersion *uint16, ciphers []uint16) *Server {
 	mux := http.NewServeMux()
 
 	tlsConfig := &tls.Config{
-		CipherSuites:             ciphers,
-		PreferServerCipherSuites: true,
+		CipherSuites: ciphers,
 	}
 
 	if tlsVersion != nil {
 		tlsConfig.MinVersion = *tlsVersion
 	}
 
-	return &server{
+	return &Server{
 		address:  address,
 		certFile: certFile,
 		keyFile:  keyFile,
@@ -44,8 +43,8 @@ func Server(address, certFile, keyFile string, tlsVersion *uint16, ciphers []uin
 	}
 }
 
-// server is the echo server internal state
-type server struct {
+// Server is the echo server internal state
+type Server struct {
 	// Address on which the server listens
 	address string
 	// Certificate file to use
@@ -59,7 +58,7 @@ type server struct {
 }
 
 // Serve starts the echo server
-func (s *server) Serve(ready chan<- struct{}) error {
+func (s *Server) Serve(ready chan<- struct{}) error {
 
 	s.mux.HandleFunc("/", echoHandler)
 
@@ -72,6 +71,6 @@ func (s *server) Serve(ready chan<- struct{}) error {
 }
 
 // Shutdown the running server
-func (s *server) Shutdown() error {
+func (s *Server) Shutdown() error {
 	return s.srv.Shutdown(context.Background())
 }
