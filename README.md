@@ -181,20 +181,19 @@ TLSv1.3 (no server order, thus listed by strength)
 
 ## FIPS compliant version
 
-The boringssl based toolchain is basically a drop in replacement. All we need to do is:
+The boringcrypto based toolchain is part of the go tool. What we need to do is to pass
+`GOEXPERIMENT=boringcrypto` flag. We can also assert for the existence of `_Cfunc__goboringcrypto_` symbol in the
+generated binary.
 
-```diff
---- a/Dockerfile	(revision 3209b023ad9173f1deebcc5ff91b4c315510299e)
-+++ b/Dockerfile	(date 1664401645292)
-@@ -1,15 +1,16 @@
--FROM golang:1.18.6
-+FROM us-docker.pkg.dev/google.com/api-project-999119582588/go-boringcrypto/golang:1.18.6b7
+```
+RUN GOEXPERIMENT=boringcrypto go build . && \
+    go tool nm fips-echo-server > tags.txt && \
+    grep '_Cfunc__goboringcrypto_' tags.txt 1> /dev/null
 ```
 
 There are some other changes in the branch, to add new option `-fipsMode`, which resets the ciphersuite to a FIPS
-compliant one. You may want to do something else, like still allow user configured ciphers as long as they are a subset
-of FIPS compliant ones, etc. But these changes are UX improvements when running in FIPS mode. No "core" app changes
-required.
+compliant one. You may want to do something else, e.g. still allow user configured ciphers as long as they are a subset
+of FIPS compliant ones.
 
 testssl reports this:
 ```
@@ -224,7 +223,6 @@ TLSv1.3 (no server order, thus listed by strength)
  Has server cipher order?     yes (OK) -- only for < TLS 1.3
  Negotiated protocol          TLSv1.3
  Negotiated cipher            TLS_AES_128_GCM_SHA256, 253 bit ECDH (X25519)
-
 ...
 ```
 

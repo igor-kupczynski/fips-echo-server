@@ -1,5 +1,5 @@
 # Start with an official image
-FROM us-docker.pkg.dev/google.com/api-project-999119582588/go-boringcrypto/golang:1.18.6b7
+FROM golang:1.19.1
 
 # Bundle the project source in the container
 RUN mkdir -p /app
@@ -7,7 +7,7 @@ ADD . /app
 WORKDIR /app
 
 # Build a binary and assert that it uses boringcrypto instead of the native golang crypto
-RUN go build . && \
+RUN GOEXPERIMENT=boringcrypto go build . && \
     go tool nm fips-echo-server > tags.txt && \
     grep '_Cfunc__goboringcrypto_' tags.txt 1> /dev/null
 
