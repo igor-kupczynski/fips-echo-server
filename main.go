@@ -18,12 +18,12 @@ var (
 func main() {
 	flag.Parse()
 
-	parsedTlsVersion, parsedCiphers, err := parseTlsConfig()
+	minTlsVersion, maxTlsVersion, parsedCiphers, err := parseTlsConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	srv := echo.NewServer(*address, *certFile, *keyFile, parsedTlsVersion, parsedCiphers)
+	srv := echo.NewServer(*address, *certFile, *keyFile, minTlsVersion, maxTlsVersion, parsedCiphers)
 
 	ready := make(chan struct{})
 	go func(ready <-chan struct{}) {
@@ -33,19 +33,19 @@ func main() {
 	log.Fatal(srv.Serve(ready))
 }
 
-func parseTlsConfig() (version *uint16, ciphers []uint16, err error) {
+func parseTlsConfig() (minVersion, maxVersion *uint16, ciphers []uint16, err error) {
 	if *tlsVersion != "" {
 		v, err := parsetls.Version(*tlsVersion)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
-		version = &v
+		minVersion = &v
 	}
 
 	if *tlsCiphers != "" {
 		ciphers, err = parsetls.CipherSuites(*tlsCiphers)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 	}
 

@@ -4,8 +4,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 )
@@ -40,7 +41,7 @@ func TestServe(t *testing.T) {
 	for _, tt := range tests {
 		port++
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServer(fmt.Sprintf("localhost:%d", port), certFile, keyFile, nil, nil)
+			s := NewServer(fmt.Sprintf("localhost:%d", port), certFile, keyFile, nil, nil, nil)
 			ready := make(chan struct{})
 			go func(ready <-chan struct{}, in, out string) {
 				<-ready
@@ -54,7 +55,7 @@ func TestServe(t *testing.T) {
 				}
 				defer resp.Body.Close()
 
-				bytes, err := ioutil.ReadAll(resp.Body)
+				bytes, err := io.ReadAll(resp.Body)
 				if err != nil {
 					t.Errorf("Can't read the response = %v", err)
 				} else if got := string(bytes); got != out {
@@ -74,7 +75,7 @@ func TestServe(t *testing.T) {
 }
 
 func buildHttpsClient(t *testing.T, caFile string) *http.Client {
-	caCert, err := ioutil.ReadFile(caFile)
+	caCert, err := os.ReadFile(caFile)
 	if err != nil {
 		t.Errorf("Can't load CA cert err=%v", err)
 	}
