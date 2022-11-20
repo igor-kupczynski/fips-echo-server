@@ -198,33 +198,33 @@ of FIPS compliant ones.
 testssl reports this:
 ```
 ...
- Testing server's cipher preferences 
+ Testing server's cipher preferences
 
 Hexcode  Cipher Suite Name (OpenSSL)       KeyExch.   Encryption  Bits     Cipher Suite Name (IANA/RFC)
 -----------------------------------------------------------------------------------------------------------------------------
 SSLv2
- - 
+ -
 SSLv3
- - 
+ -
 TLSv1
- - 
+ -
 TLSv1.1
- - 
+ -
 TLSv1.2 (server order)
- xc02f   ECDHE-RSA-AES128-GCM-SHA256       ECDH 521   AESGCM      128      TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256              
- xc030   ECDHE-RSA-AES256-GCM-SHA384       ECDH 521   AESGCM      256      TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384              
- x9c     AES128-GCM-SHA256                 RSA        AESGCM      128      TLS_RSA_WITH_AES_128_GCM_SHA256                    
- x9d     AES256-GCM-SHA384                 RSA        AESGCM      256      TLS_RSA_WITH_AES_256_GCM_SHA384                    
-TLSv1.3 (no server order, thus listed by strength)
- x1302   TLS_AES_256_GCM_SHA384            ECDH 253   AESGCM      256      TLS_AES_256_GCM_SHA384                             
- x1303   TLS_CHACHA20_POLY1305_SHA256      ECDH 253   ChaCha20    256      TLS_CHACHA20_POLY1305_SHA256                       
- x1301   TLS_AES_128_GCM_SHA256            ECDH 253   AESGCM      128      TLS_AES_128_GCM_SHA256                             
+ xc02f   ECDHE-RSA-AES128-GCM-SHA256       ECDH 521   AESGCM      128      TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+ xc030   ECDHE-RSA-AES256-GCM-SHA384       ECDH 521   AESGCM      256      TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+ x9c     AES128-GCM-SHA256                 RSA        AESGCM      128      TLS_RSA_WITH_AES_128_GCM_SHA256
+ x9d     AES256-GCM-SHA384                 RSA        AESGCM      256      TLS_RSA_WITH_AES_256_GCM_SHA384
+TLSv1.3
+ -
 
- Has server cipher order?     yes (OK) -- only for < TLS 1.3
- Negotiated protocol          TLSv1.3
- Negotiated cipher            TLS_AES_128_GCM_SHA256, 253 bit ECDH (X25519)
+ Has server cipher order?     yes (OK)
+ Negotiated protocol          TLSv1.2
+ Negotiated cipher            ECDHE-RSA-AES128-GCM-SHA256, 521 bit ECDH (P-521)
 ...
 ```
+
+The context on why limit to TLS in 1.2 is in #2.
 
 ### Performance implication
 

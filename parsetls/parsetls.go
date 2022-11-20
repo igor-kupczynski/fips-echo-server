@@ -68,8 +68,14 @@ func CipherSuites(input string) ([]uint16, error) {
 	return cipers, nil
 }
 
-// FIPSTLSVersion specifies a FIPS compliant minimum TLS version
-const FIPSTLSVersion = "TLSv1.2"
+// MinFIPSTLSVersion specifies a FIPS compliant minimum TLS version
+const MinFIPSTLSVersion = tls.VersionTLS12
+
+// MaxFIPSTLSVersion specifies a FIPS compliant minimum TLS version
+//
+// See https://github.com/igor-kupczynski/fips-echo-server/issues/2 for the details on why TLS 1.3 is not FIPS
+// compliant in boringcrypto yet.
+const MaxFIPSTLSVersion = tls.VersionTLS12
 
 // FIPSCiphers specify a list of FIPS compliant ciphers
 // The list is taken from https://github.com/golang/go/blob/dev.boringcrypto.go1.13/src/crypto/tls/boring.go#L54

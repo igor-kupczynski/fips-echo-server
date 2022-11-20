@@ -13,7 +13,7 @@ var (
 	keyFile    = flag.String("keyFile", "certs/domain.key", "path to server key")
 	tlsVersion = flag.String("tlsVersion", "", "min TLS version, e.g. TLSv1.3")
 	tlsCiphers = flag.String("tlsCiphers", "", "ciphersuites to use in mozilla string format, e.g. TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:ECDHE-RSA-AES128-GCM-SHA256")
-	fipsMode = flag.String("fipsMode", "false", "If true it overrides the min TLS version and ciphersuites with FIPS compliant set", )
+	fipsMode   = flag.String("fipsMode", "false", "If true it overrides the min TLS version and ciphersuites with FIPS compliant set")
 )
 
 func main() {
@@ -36,12 +36,18 @@ func main() {
 
 func parseTlsConfig() (minVersion, maxVersion *uint16, ciphers []uint16, err error) {
 	if *fipsMode == "true" {
-		fipsVersion := parsetls.FIPSTLSVersion
-		tlsVersion = &fipsVersion
-		fipsCiphers := parsetls.FIPSCiphers
-		tlsCiphers = &fipsCiphers
-		log.Printf("Switch TLS settings to FIPS compliant: %s %s\n", fipsVersion, fipsCiphers)
+		minFipsVersion := uint16(parsetls.MinFIPSTLSVersion)
+		minVersion = &minFipsVersion
+		maxFipsVersion := uint16(parsetls.MaxFIPSTLSVersion)
+		maxVersion = &maxFipsVersion
+		ciphers, err = parsetls.CipherSuites(parsetls.FIPSCiphers)
+		if err != nil {
+			panic(err)
+		}
+		log.Printf("Switch TLS settings to FIPS compliant: %s\n", parsetls.FIPSCiphers)
+		return
 	}
+
 	if *tlsVersion != "" {
 		v, err := parsetls.Version(*tlsVersion)
 		if err != nil {
