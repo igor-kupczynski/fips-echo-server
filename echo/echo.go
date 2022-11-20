@@ -20,15 +20,18 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // NewServer returns a Server struct
-func NewServer(address, certFile, keyFile string, tlsVersion *uint16, ciphers []uint16) *Server {
+func NewServer(address, certFile, keyFile string, minTlsVersion, maxTlsVersion *uint16, ciphers []uint16) *Server {
 	mux := http.NewServeMux()
 
 	tlsConfig := &tls.Config{
 		CipherSuites: ciphers,
 	}
 
-	if tlsVersion != nil {
-		tlsConfig.MinVersion = *tlsVersion
+	if minTlsVersion != nil {
+		tlsConfig.MinVersion = *minTlsVersion
+	}
+	if maxTlsVersion != nil {
+		tlsConfig.MaxVersion = *maxTlsVersion
 	}
 
 	return &Server{
