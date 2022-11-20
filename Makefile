@@ -1,4 +1,4 @@
-label = fips-echo-server:go1.19.1
+label = fips-echo-server:go1.19.3
 addr = 127.0.0.1:8443
 
 help:
