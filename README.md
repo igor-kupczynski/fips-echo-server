@@ -226,6 +226,24 @@ TLSv1.3
 
 The context on why limit to TLS in 1.2 is in #2.
 
+### Force FIPS-compliant crypto at compile time
+
+Instead of manually setting FIPS-complaint ciphers and TLS versions you add a following file to your project:
+```go
+//go:build boringcrypto
+// +build boringcrypto
+
+package main
+
+import _ "crypto/tls/fipsonly"
+```
+
+This forces TLSv1.2 and FIPS ciphers regardless of the runtime settings. If you don't need FIPS/non-FIPS selection
+at runtime this is simpler and more convenient.
+
+See [`"crypto/tls/fipsonly"` package](https://github.com/golang/go/blob/go1.19.3/src/crypto/tls/fipsonly/fipsonly.go)
+for details.
+
 ### Performance implication
 
 See [golang/go#21525](https://github.com/golang/go/issues/21525). Calling boringcrypto via cgo adds about 200ns per
