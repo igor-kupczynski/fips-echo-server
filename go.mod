@@ -1,3 +1,3 @@
 module github.com/igor-kupczynski/fips-echo-server
 
-go 1.19
+go 1.21
